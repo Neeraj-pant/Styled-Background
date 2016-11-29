@@ -29,11 +29,20 @@ var ext_time = setInterval(function(){
 			location.reload();
 		});
 
+		addPageJs();
+
 		clearInterval(ext_time);
 	}
 });
 
-var url = "http://www.google.com&output=embed";
-window.location.replace(url);
+function addPageJs()
+{
+	$('.control').click( function(){
+	  $('body').addClass('mode-search');
+	  $('.input-search').focus();
+	});
 
-
+	$('.icon-close').click( function(){
+	  $('body').removeClass('mode-search');
+	});
+}

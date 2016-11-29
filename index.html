@@ -5,16 +5,37 @@
 	<script src="js/jquery-3.1.1.min.js" type="text/javascript" charset="utf-8" async defer></script>
 	<script src="js/page.js" type="text/javascript" charset="utf-8" async defer></script>
 	<link rel="stylesheet" type="text/css" href="css/page.css">
+	<link rel="stylesheet" type="text/css" href="css/search.css">
 </head>
 <body>
 	<div id="bing-wrapper">
 		<iframe src="https://www.bing.com" id="frame" class="frame"></iframe>
 	</div>
 	<div id="google-wrapper" style="display: none">
-		<iframe src="https://www.google.com&output=embed" id="frame2" class="frame"></iframe>
+		<div class='header'>
+			<div class='header-content'>
+				<h1>Material Search Effect</h1>
+				<h2>Usign CSS Transitions</h2>
+			</div>
+			<div class='control' tabindex='1'>
+				<div class='btn'></div>
+				<i class='icon-search ion-search'></i>
+			</div>
+		</div>
+		<i class='icon-close ion-ios-close-empty'>x</i>
+		<form class='form' action="https://www.google.com/search" method="get">
+			<input class='input-search' name="q" placeholder='Search' type='text'>
+			<input type="submit" value="Search" />
+		</form>
+		<div class='wrapper'>
+			<div id='h2'>Search</div>
+		</div>
 	</div>
 	<div id="custom-wrapper" style="display: none">
-		custom wrapper Page
+		<div class="back-page">
+			
+		</div>
 	</div>
 </body>
 </html>
+	
