@@ -8,3 +8,122 @@ body{
 .frame{
 	border:none;
 }
+
+#select-image{
+    position: absolute;
+    z-index: -1;
+    opacity: 0;
+}
+
+.select-image + label svg {
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+    margin-top: -0.25em;
+    margin-right: 0.25em;
+}
+svg:not(:root) {
+    overflow: hidden;
+}
+.upload-image {
+    display: inline-block;
+}
+#color-bar{
+	position: relative;
+    padding: 10px;
+}
+input[id^=ext-color] + label {
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+    border: 1px solid;
+    box-sizing: border-box;
+}
+
+input[id^=ext-color] {
+    opacity: 0;
+    position: absolute;
+}
+
+input[id^=ext-color]:checked ~ label{
+   border: 2px dashed #150000;
+}
+
+.color-tile li{
+	display: inline-block;
+    list-style: none;
+    padding-right: 5px;
+}
+.color-tile label[for="ext-color-1"]{
+    background-color: rgb(67, 205, 255);
+    border-color: rgb(0, 154, 210);
+}
+.color-tile label[for="ext-color-2"]{
+    background-color: rgb(255, 73, 73);
+    border-color: rgb(208, 2, 2)
+}
+.color-tile label[for="ext-color-3"]{
+    background-color: rgb(86, 115, 247);
+    border-color: rgb(0, 45, 251);
+}
+.color-tile label[for="ext-color-4"]{
+    background-color: rgb(255, 146, 73);
+    border-color: rgb(193, 78, 0);
+}
+.color-tile label[for="ext-color-5"]{
+    background-color: rgb(223, 239, 65);
+    border-color: rgb(154, 169, 6);
+}
+
+header#header {
+    height: 70px;
+    line-height: 70px;
+    text-align: center;
+}
+
+.google-search-submit{
+    background: url('../images/search_i1.png') 11px 11px / 20px no-repeat;
+    position: absolute;
+    margin-left: -1px;
+    top: 14px;
+    height: 41px;
+    width: 41px;
+    background-color: #4285f4;
+    border: none;
+    color: #fff;
+    border-radius: 0 2px 2px 0;
+}
+
+
+input.search-input {
+    height: 25px;
+    width: 50%;
+    opacity: 0.7;
+    border: 0.70px solid rgba(64, 63, 63, 0.53);
+    outline: none;
+    padding: 7px;
+    font-size: 16px;
+}
+input.search-input:focus{
+	border-color: #4d90fe;
+}
+
+.myObjects {
+    display: inline-block;
+    width: 50%;
+    position: absolute;
+    left: 23%;
+    top: 54px;
+    box-shadow: 0px 5px 14px 0px #525252;
+    background: #f5f5f5;
+}
+
+.myObjects p{
+    height: 20px;
+    // border-bottom: 0.30px solid rgba(64, 63, 63, 0.53);
+}
+.search-text:hover{
+    background-color: #ccc;
+}
+
+
