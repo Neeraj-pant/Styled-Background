@@ -16,8 +16,8 @@ body{
 }
 
 .select-image + label svg {
-    width: 1em;
-    height: 1em;
+    width: 3.5em;
+    height: 3.5em;
     vertical-align: middle;
     margin-top: -0.25em;
     margin-right: 0.25em;
@@ -27,16 +27,46 @@ svg:not(:root) {
 }
 .upload-image {
     display: inline-block;
+    position: absolute;
+    bottom: 10px;
 }
+
 #color-bar{
-	position: relative;
-    padding: 10px;
+    position: absolute;
+    top: 10px;
+    width: 150px;
+    left: 0;
 }
+.color-tile{
+    position: relative;
+    left: -140px;
+    -webkit-transition: all .5s ease;
+    -moz-transition: all .5s ease;
+    -ms-transition: all .5s ease;
+    transition: all .5s ease;
+}
+.color-in{
+    left: 30px;
+}
+
+.color-panel-toggle{
+    height: 20px;
+    width: 20px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: #fff url('../images/arrow_right.png') 0 0 / 100% 100% no-repeat;
+}
+.arrow-out{
+    background-image: url('../images/arrow_left.png');
+}
+
+
 input[id^=ext-color] + label {
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
     display: inline-block;
-    border: 1px solid;
+    border: 2px solid;
     box-sizing: border-box;
 }
 
@@ -46,7 +76,10 @@ input[id^=ext-color] {
 }
 
 input[id^=ext-color]:checked ~ label{
-   border: 2px dashed #150000;
+   transform: scale(1.3);
+   -webkit-transform: scale(1.3);
+   -moz-transform: scale(1.3);
+   -ms-transform: scale(1.3);
 }
 
 .color-tile li{
@@ -75,6 +108,44 @@ input[id^=ext-color]:checked ~ label{
     border-color: rgb(154, 169, 6);
 }
 
+
+
+
+#sidebar {
+    position: relative;
+    display: table;
+    padding-top: 20px;
+    padding-left: 10px;
+}
+
+input[id^=ext-image] + label {
+    display: inline-block;
+    border: 1px solid;
+    box-sizing: border-box;
+    outline: 1px solid #fff;
+    border: 2px dashed transparent;
+}
+
+input[id^=ext-image] {
+    opacity: 0;
+    position: absolute;
+}
+
+input[id^=ext-image]:checked ~ label{
+   border-color: #fff;
+}
+
+.image-tile li{
+    list-style: none;
+    width: 60px;
+    padding-right: 5px;
+    margin-top: 10px;
+}
+.image-tile li img{
+    width: 100%;
+}
+
+
 header#header {
     height: 70px;
     line-height: 70px;
@@ -98,7 +169,7 @@ header#header {
 input.search-input {
     height: 25px;
     width: 50%;
-    opacity: 0.7;
+    opacity: 1;
     border: 0.70px solid rgba(64, 63, 63, 0.53);
     outline: none;
     padding: 7px;
@@ -125,5 +196,4 @@ input.search-input:focus{
 .search-text:hover{
     background-color: #ccc;
 }
-
 

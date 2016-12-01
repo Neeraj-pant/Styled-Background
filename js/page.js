@@ -27,12 +27,13 @@ var ext_time = setInterval(function(){
 		frame.height(jQuery(window).height());
 		frame.width(jQuery(window).width());
 
-		jQuery(document).resize(function(){
+		jQuery(window).resize(function(){
 			location.reload();
 		});
 
 		addPageJs();
 		colorScheme();
+		customPageLayout();
 
 		clearInterval(ext_time);
 	}
@@ -53,41 +54,41 @@ function addPageJs()
 		window.location.href = "https://www.google.com/search?q="+$(this).text();
 	});
 
+	// Color Tile Show, Hide
+	$(".color-panel-toggle").click(function(){
+		$(".color-tile").toggleClass('color-in');
+		$(this).toggleClass('arrow-out');
+	});
+
 }
+
+
 
 function colorScheme(){
 	$("#image-svg").css('fill', '#64ffaa');
 	// $(".upload-image").css('background-image', '#64ffaa');
 	$("#header").css('background-color', 'rgba(0, 0, 0, 0.32)');
 
+
 }
 
-function searchSuggestion()
+function customPageLayout()
 {
-	$("#google-search").on('keyup', function(){
-		var res = $(this).val();
-		$.ajax({
-			url : "https://www.google.com/complete/search?sclient=psy-ab&q="+res
-		})
-		.done(function(data){
-			$(".myObjects").html('');
-			$.each( data, function( key, value ) {
-				if(typeof value == 'object'){
-					$.each( value, function( s_key, s_value ) {
-						if(s_value[0] != '' && s_value[0] != 'undefined'){
-							$(".myObjects").append("<p class='search-text'>"+s_value[0]+"<p/>");
-							$(".search-text").each(function(k, val){
-								console.log(val);
-								if(val.text() == '' || val.text() == undefined){
-									val.remove();
-								}
-							});
-						}
-					});
-				}
-			});
-		});
-	});
+	var page_wraper = $(".back-page");
+	var header = $("#header");
+	var sidebar = $("#sidebar");
+	var win_height = $(window).height();
+
+	page_wraper.css('background', '#000 url(images/back1.png) 0 0/100% no-repeat');
+	page_wraper.height(win_height);
+	sidebar.height(win_height - header.height() - 20);
+
 }
+
+
+
+
+
+
 
 
