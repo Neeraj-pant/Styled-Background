@@ -2,9 +2,17 @@
 	margin: 0;
 	padding: 0;
 }
+html, body{
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+}
 body{
 	overflow: hidden;
+    font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
+    font-size: 100%;
 }
+
 .frame{
 	border:none;
     height: 100%;
@@ -14,107 +22,6 @@ body{
     height: 100%;
     widht: 100%;
 }
-
-#select-image{
-    position: absolute;
-    z-index: -1;
-    opacity: 0;
-}
-
-.select-image + label svg {
-    width: 3.5em;
-    height: 3.5em;
-    vertical-align: middle;
-    margin-top: -0.25em;
-    margin-right: 0.25em;
-}
-svg:not(:root) {
-    overflow: hidden;
-}
-.upload-image {
-    display: inline-block;
-    position: absolute;
-    bottom: 10px;
-}
-
-#color-bar{
-    position: absolute;
-    top: 10px;
-    width: 150px;
-    left: 0;
-}
-.color-tile{
-    position: relative;
-    left: -140px;
-    -webkit-transition: all .5s ease;
-    -moz-transition: all .5s ease;
-    -ms-transition: all .5s ease;
-    transition: all .5s ease;
-}
-.color-in{
-    left: 30px;
-}
-
-.color-panel-toggle{
-    height: 20px;
-    width: 20px;
-    position: absolute;
-    left: 0;
-    top: 0;
-    background: #fff url('../images/arrow_right.png') 0 0 / 100% 100% no-repeat;
-}
-.arrow-out{
-    background-image: url('../images/arrow_left.png');
-}
-
-
-input[id^=ext-color] + label {
-    width: 20px;
-    height: 20px;
-    display: inline-block;
-    border: 2px solid;
-    box-sizing: border-box;
-}
-
-input[id^=ext-color] {
-    opacity: 0;
-    position: absolute;
-}
-
-input[id^=ext-color]:checked ~ label{
-   transform: scale(1.3);
-   -webkit-transform: scale(1.3);
-   -moz-transform: scale(1.3);
-   -ms-transform: scale(1.3);
-}
-
-.color-tile li{
-	display: inline-block;
-    list-style: none;
-    padding-right: 5px;
-}
-.color-tile label[for="ext-color-1"]{
-    background-color: rgb(67, 205, 255);
-    border-color: rgb(0, 154, 210);
-}
-.color-tile label[for="ext-color-2"]{
-    background-color: rgb(255, 73, 73);
-    border-color: rgb(208, 2, 2)
-}
-.color-tile label[for="ext-color-3"]{
-    background-color: rgb(86, 115, 247);
-    border-color: rgb(0, 45, 251);
-}
-.color-tile label[for="ext-color-4"]{
-    background-color: rgb(255, 146, 73);
-    border-color: rgb(193, 78, 0);
-}
-.color-tile label[for="ext-color-5"]{
-    background-color: rgb(223, 239, 65);
-    border-color: rgb(154, 169, 6);
-}
-
-
 
 
 #sidebar {
@@ -126,10 +33,10 @@ input[id^=ext-color]:checked ~ label{
 
 input[id^=ext-image] + label {
     display: inline-block;
-    border: 1px solid;
-    box-sizing: border-box;
-    outline: 1px solid #fff;
-    border: 3px solid transparent;
+}
+
+input[id^=ext-image] + label:hover{
+
 }
 
 input[id^=ext-image] {
@@ -144,65 +51,20 @@ input[id^=ext-image]:checked ~ label{
 .image-tile li{
     list-style: none;
     width: 80px;
-    padding-right: 5px;
-    margin-top: 10px;
+    opacity: 0.5;
+    transition: all 0.3s ease-in;
+}
+.image-tile li:hover{
+    opacity: 1;
+}
+.image-tile li:hover img{
+    box-shadow: 0 0 7px 2px #ff7e75;
+    width: 100px;
 }
 .image-tile li img{
     width: 100%;
+    transition: all 0.4s ease-out;
 }
-
-
-header#header {
-    height: 50px;
-    line-height: 50px;
-    text-align: center;
-}
-
-.google-search-submit{
-    background: url(../images/search_i1.png) 11px 11px / 20px no-repeat;
-    position: absolute;
-    margin-left: -1px;
-    top: 4px;
-    height: 41px;
-    width: 41px;
-    background-color: #4285f4;
-    border: none;
-    color: #fff;
-    border-radius: 0 2px 2px 0;
-}
-
-
-input.search-input {
-    height: 25px;
-    width: 50%;
-    opacity: 1;
-    border: 0.70px solid rgba(64, 63, 63, 0.53);
-    outline: none;
-    padding: 7px;
-    font-size: 16px;
-}
-input.search-input:focus{
-	border-color: #4d90fe;
-}
-
-.myObjects {
-    display: inline-block;
-    width: 50%;
-    position: absolute;
-    left: 23%;
-    top: 54px;
-    box-shadow: 0px 5px 14px 0px #525252;
-    background: #f5f5f5;
-}
-
-.myObjects p{
-    height: 20px;
-    // border-bottom: 0.30px solid rgba(64, 63, 63, 0.53);
-}
-.search-text:hover{
-    background-color: #ccc;
-}
-
 
 
 .overlay{
@@ -213,17 +75,19 @@ input.search-input:focus{
     background: -webkit-gradient(linear,left top,left bottom,color-stop(0,rgba(0,0,0,.25)),color-stop(20%,transparent),color-stop(60%,transparent),to(rgba(0,0,0,.3)));
 }
 .back-page{
-    height: 100%;
     background-color: #fff;
     background-position: 50%;
     background-size: cover;
+    transition: all 1s ease-in;
+    height: 100%;
 }
 #custom-wrapper{
     height: 100%;
 }
 
 .page-element{
-    position: relative;
+    position: absolute;
     z-index: 2;
+    bottom: 10px;
 }
 
