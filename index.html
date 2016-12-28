@@ -4,22 +4,24 @@
 	<title>New Tab</title>
 	<link rel="stylesheet" type="text/css" href="css/page.css">
 </head>
-<body>
+<body style="background: #2f2f2f;">
 	<div id="bing-wrapper" style="display: none">
 		<iframe src="" id="frame" class="frame"></iframe>
 	</div>
 	<div id="google-wrapper" style="display: none"></div>
 	<div id="custom-wrapper" style="display: none">
-		<div class="back-page">
+		<div class="back-page" style="opacity:0;">
 			<div class="page-element">
 				<sidebar id="sidebar">
 					<div class="image-wrapper">
 						<ul class="image-tile" id="thumbs"></ul>
 					</div>
 				</sidebar>
-				<footer>
-				</footer>
 			</div>
+			<main id="main">
+				<p class="ask-name">Let&spos;s display your Name</p>
+				<input type="text" placeholder="">
+			</main>
 		</div>
 		<div class="overlay"></div>
 	</div>

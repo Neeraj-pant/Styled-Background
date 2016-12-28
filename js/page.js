@@ -57,8 +57,16 @@
             if (obj.page_background_image != undefined) {
                 var url = localStorage.getItem(obj.page_background_image);
                 page_wraper.style.backgroundImage = 'url(' + url + ')';
+                var animate = setInterval(function(){
+                    page_wraper.style.opacity = 1;
+                    clearInterval(animate);
+                }, 5);
             } else {
                 page_wraper.style.backgroundImage = 'url(images/back1.png)';
+                var animate = setInterval(function(){
+                    page_wraper.style.opacity = 1;
+                    clearInterval(animate);
+                }, 5);
             }
         });
     }
@@ -82,8 +90,19 @@
         if (is_next_day) {
             var url="https://source.unsplash.com/daily";
             var convertFunction = convertFileToDataURLviaFileReader;
+            var data = [];
+            var index = localStorage.length;
+            if(index != 0){
+                for(var i = 0; i < index; i++){
+                    data[i] = localStorage.getItem(i);
+                }
+                data.reverse();
+                localStorage.clear();
+                for(var j = 0; j < index; j++){
+                    localStorage.setItem(data[i]);
+                }
+            }
             convertFunction(url, function(base64Img){
-                var index = localStorage.length;
                 localStorage.setItem(0, base64Img);
                 var date = getCurrentDate();
                 chrome.storage.sync.set({'image_change_time': date}, function () {});
@@ -94,6 +113,8 @@
 
 
     function generateNewThumbs() {
+        var win_width = screen.width;
+        var win_height = screen.height;
         var url="https://source.unsplash.com/random/"+win_width+"x"+win_height;
         var i = 1;
         var arrange_thumb = function(){

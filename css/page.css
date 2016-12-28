@@ -9,7 +9,7 @@ html, body{
 }
 body{
 	overflow: hidden;
-    font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
+    font-family: "Lato", "Lucida Grande", Tahoma, sans-serif;
     font-size: 100%;
 }
 
@@ -51,8 +51,9 @@ input[id^=ext-image]:checked ~ label{
 .image-tile li{
     list-style: none;
     width: 80px;
-    opacity: 0.5;
+    opacity: 0.7;
     transition: all 0.3s ease-in;
+    margin: 5px 0;
 }
 .image-tile li:hover{
     opacity: 1;
@@ -89,5 +90,12 @@ input[id^=ext-image]:checked ~ label{
     position: absolute;
     z-index: 2;
     bottom: 10px;
+}
+main#main {
+    position: absolute;
+    top: 85%;
+    left: 50%;
+    z-index: 99;
+    transform: translateX(-50%);
 }
 
