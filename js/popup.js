@@ -18,18 +18,7 @@ chrome.storage.sync.get("selected_background", function (obj) {
 
 all_option.forEach(function(item,index,arr) {
     item.addEventListener('click', function(){
-        if(this.value == 'bing')
-        {
-            chrome.storage.sync.set({'selected_background': 'bing'}, function() {});
-        }
-        else if(this.value == 'google')
-        {
-            chrome.storage.sync.set({'selected_background': 'google'}, function() {});
-        }
-        else if(this.value == 'custom')
-        {
-            chrome.storage.sync.set({'selected_background': 'custom'}, function() {});
-        }
+        chrome.storage.sync.set({'selected_background': this.value}, function() {});
         window.location.href = window.location.href;
     });
 });
