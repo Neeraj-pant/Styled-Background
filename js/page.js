@@ -1,4 +1,3 @@
-(function() {
 	var selected_background;
 	var bing_frame = document.getElementById('frame');
 	var bing_opt = document.getElementById('bing-wrapper');
@@ -7,7 +6,6 @@
 	var time_wraper = document.getElementById('current-time');
 
 	var page_wraper = document.getElementsByClassName('back-page')[0];
-	var new_image_id = Math.floor(Math.random() * 1084);
 
 	var quote_wraper = document.getElementById("quote");
 	var is_next_day = false;
@@ -32,10 +30,11 @@
 	function customImagePageInit() {
 
 		// Clear Every Stored Data
-		/*		
+		/*
 		chrome.storage.sync.remove('thumb_images', function (obj) {alert('removed thumb images');});
 		chrome.storage.sync.remove('page_background_image', function (obj) {alert('removed background image');});
 		chrome.storage.sync.remove('image_change_time', function (obj) {alert('removed Image Change Time');});
+		chrome.storage.sync.remove('quote', function(obj) {alert('Removed Quote')});
 		localStorage.clear();
 		return;
 		//*/
@@ -77,9 +76,8 @@
 		chrome.storage.sync.get('quote', function(obj) {
 			if (obj.quote != undefined) {
 				quote_wraper.innerHTML = obj.quote;
-				quote_wraper.getElementsByTagName('a')[0].href = "http://wordsmith.org";
 			}
-		});	
+		});
 	}
 
 
@@ -89,10 +87,11 @@
 				var now = getCurrentDate();
 				var old = obj.image_change_time;
 				is_next_day = (now.day != old.day) ? true : false;
+				generateImageRandomIds();
 			} else {
 				is_next_day = true;
+				generateImageRandomIds();
 			}
-			generateImageRandomIds();
 		});
 	}
 
@@ -101,31 +100,11 @@
 		if (is_next_day) {
 			var url = "https://source.unsplash.com/daily";
 			var convertFunction = convertFileToDataURLviaFileReader;
-			var data = [];
-			var index = localStorage.length;
-			if (index != 0) {
-				for (var i = 0; i < index; i++) {
-					data[i] = localStorage.getItem(i);
-				}
-				
-				var temp = data[0];
-				data[0] = data[1];
-				data[1] = data[2];
-				data[2] = temp;
-
-				localStorage.clear();
-				for (var j = 0; j < index; j++) {
-					localStorage.setItem(j, data[j]);
-				}
-			}
 			convertFunction(url, function(base64Img) {
 				localStorage.setItem(0, base64Img);
 				var date = getCurrentDate();
 				chrome.storage.sync.set({ 'image_change_time': date }, function() {});
-				
-				if(localStorage.length <= 1){
-					generateNewThumbs();
-				}
+				generateNewThumbs();
 			});
 			getQuote();
 		}
@@ -146,11 +125,11 @@
 					if(old_val != base64Img){
 						localStorage.setItem(i, base64Img);
 						i++;
-						arrange_thumb();
 						old_val = base64Img;
+						arrange_thumb();
 					}
 				});
-			} else {
+			}else{
 				createImageThumbs();
 			}
 		}
@@ -163,12 +142,23 @@
 			var list = document.createElement('li');
 			var thumb_img = localStorage.getItem(i);
 			var background = localStorage.key(i);
-			var new_thumb = "<input type='radio' class='img-option' id='ext-image-" + i + "' name='image-select' value='" + background + "'>" + " <label for='ext-image-" + i + "'><img src='" + thumb_img + "'></label>";
+			if( i != 0 ){
+				var new_thumb = "<input type='radio' class='img-option' id='ext-image-" + i + "' name='image-select' value='" + background + "'>" + " <label for='ext-image-" + i + "'><img src='" + thumb_img + "'></label><span class='make-fav' data-id='"+i+"'></span>";
+			}else{
+				var new_thumb = "<input type='radio' class='img-option' id='ext-image-" + i + "' name='image-select' value='" + background + "'>" + " <label for='ext-image-" + i + "'><img src='" + thumb_img + "'></label>";
+			}
+
 			list.innerHTML = new_thumb;
 			list_parent.appendChild(list);
 
-			if( i == 1 ){
-				list_parent.querySelector("input").click();
+			if( i == localStorage.length - 1 ){
+				chrome.storage.sync.get('page_background_image', function(obj) {
+					if(obj.page_background_image == undefined){
+						setTimeout(function(){
+							document.getElementsByClassName('img-option')[0].click();
+						}, 500);
+					}
+				});
 			}
 		}
 		changeBackgroundImage();
@@ -235,19 +225,10 @@
 	}
 
 	function getQuote() {
-		var xhttp = new XMLHttpRequest();
-		xhttp.onreadystatechange = function() {
-			if (this.readyState == 4 && this.status == 200) {
-				var quote = this.responseText;
-				quote = quote.substring(18, quote.length - 4);
-				quote = quote.replace(/\<br\>/g,"");
-				chrome.storage.sync.remove('quote', function (obj) {});
-				chrome.storage.sync.set({ 'quote': quote }, function() {});
-				displayDailyQuote();
-			}
-		};
-		xhttp.open("GET", "http://wordsmith.org/words/quote.js", true);
-		xhttp.send();
+		var random_num = Math.floor(Math.random() * 437)
+		var quote = quotes[random_num];
+		chrome.storage.sync.set({ 'quote': quote }, function() {});
+		displayDailyQuote();
 	}
 
 
@@ -276,5 +257,3 @@
 	} else {
 	  console.log('good evening')
 	}
-
-})()

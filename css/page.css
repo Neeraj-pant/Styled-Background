@@ -33,7 +33,7 @@ input[id^=ext-image] + label {
 	display: inline-block;
 }
 input[id^=ext-image] {
-	opacity: 0;
+	opacity: 1;
 	position: absolute;
 }
 
@@ -47,6 +47,7 @@ input[id^=ext-image]:checked ~ label{
 	opacity: 0.85;
 	transition: all 0.2s ease-in;
 	margin: 10px 0;
+	position: relative;
 }
 .image-tile li:hover{
 	opacity: 1;
@@ -59,6 +60,7 @@ input[id^=ext-image]:checked ~ label{
 	width: 100%;
 	transition: all 0.2s ease-out;
 	box-shadow: 2px 2px 5px 2px #2b2b2b;
+	border: 1px solid rgba(255, 255, 255, 0.51)
 }
 
 
@@ -73,7 +75,7 @@ input[id^=ext-image]:checked ~ label{
 	background-color: #fff;
 	background-position: 50%;
 	background-size: cover;
-	transition: all 1s ease-in;
+	transition: all 0.8s ease-in;
 	height: 100%;
 }
 #custom-wrapper{
@@ -86,13 +88,14 @@ input[id^=ext-image]:checked ~ label{
 	bottom: 10px;
 	left: 5px;
 }
-main#main {
+#main {
 	position: absolute;
 	bottom: 20px;
 	left: 50%;
 	z-index: 99;
 	transform: translateX(-50%);
 	width: 80%;
+	text-align: center;
 }
 
 #quote {
@@ -104,6 +107,7 @@ main#main {
 	background: rgba(0, 0, 0, 0.5);
 	border-radius: 5px;
 	padding: 12px;
+	display: inline-block;
 }
 
 #quote b {display: none;}
@@ -130,7 +134,15 @@ main#main {
     background: rgba(0, 0, 0, 0.56);
     padding: 10px;
 }
-
+.make-fav{
+	background-color: rgba(0, 0, 0, 0.66);
+    width: 25px;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    z-index: 999;
+    top: 0;
+}
 
 
 
