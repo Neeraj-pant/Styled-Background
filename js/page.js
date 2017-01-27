@@ -30,11 +30,13 @@
 	function customImagePageInit() {
 
 		// Clear Every Stored Data
+		
 		/*
 		chrome.storage.sync.remove('thumb_images', function (obj) {alert('removed thumb images');});
 		chrome.storage.sync.remove('page_background_image', function (obj) {alert('removed background image');});
 		chrome.storage.sync.remove('image_change_time', function (obj) {alert('removed Image Change Time');});
 		chrome.storage.sync.remove('quote', function(obj) {alert('Removed Quote')});
+		chrome.storage.sync.remove('fav_images', function(obj) {alert('Removed Fav images')});
 		localStorage.clear();
 		return;
 		//*/
@@ -86,7 +88,7 @@
 			if (obj.image_change_time != undefined) {
 				var now = getCurrentDate();
 				var old = obj.image_change_time;
-				is_next_day = (now.day != old.day) ? true : false;
+				is_next_day = (now.day != old.day) ? true : true;
 				generateImageRandomIds();
 			} else {
 				is_next_day = true;
@@ -120,13 +122,22 @@
 
 		var arrange_thumb = function() {
 			if (i <= 2) {
-				var convertFunction = convertFileToDataURLviaFileReader;
-				convertFunction(url, function(base64Img) {
-					if(old_val != base64Img){
-						localStorage.setItem(i, base64Img);
-						i++;
-						old_val = base64Img;
-						arrange_thumb();
+				chrome.storage.sync.get('fav_images', function(obj){
+					if(obj.fav_images != undefined){
+						if(obj.fav_images[i] == "true"){
+							i++;
+							arrange_thumb();
+						}else{
+							var convertFunction = convertFileToDataURLviaFileReader;
+							convertFunction(url, function(base64Img) {
+								if(old_val != base64Img){
+									localStorage.setItem(i, base64Img);
+									i++;
+									old_val = base64Img;
+									arrange_thumb();
+								}
+							});
+						}
 					}
 				});
 			}else{
@@ -138,30 +149,50 @@
 
 	function createImageThumbs() {
 		var list_parent = document.getElementById('thumbs');
-		for (var i = 0; i < localStorage.length; i++) {
-			var list = document.createElement('li');
-			var thumb_img = localStorage.getItem(i);
-			var background = localStorage.key(i);
-			if( i != 0 ){
-				var new_thumb = "<input type='radio' class='img-option' id='ext-image-" + i + "' name='image-select' value='" + background + "'>" + " <label for='ext-image-" + i + "'><img src='" + thumb_img + "'></label><span class='make-fav' data-id='"+i+"'></span>";
-			}else{
-				var new_thumb = "<input type='radio' class='img-option' id='ext-image-" + i + "' name='image-select' value='" + background + "'>" + " <label for='ext-image-" + i + "'><img src='" + thumb_img + "'></label>";
+		list_parent.innerHTML = '';
+		var fav_images = '';
+		var is_fav = false;
+		var star_src = 'images/star.png';
+
+		chrome.storage.sync.get('fav_images', function(obj){
+			if(obj.fav_images != undefined){
+				fav_images = obj.fav_images;
 			}
 
-			list.innerHTML = new_thumb;
-			list_parent.appendChild(list);
+			for (var i = 0; i < localStorage.length; i++) {
+				var list = document.createElement('li');
+				var thumb_img = localStorage.getItem(i);
+				var background = localStorage.key(i);
 
-			if( i == localStorage.length - 1 ){
-				chrome.storage.sync.get('page_background_image', function(obj) {
-					if(obj.page_background_image == undefined){
-						setTimeout(function(){
-							document.getElementsByClassName('img-option')[0].click();
-						}, 500);
-					}
-				});
+				if(fav_images[i] == 'true'){
+					is_fav = true;
+					star_src = 'images/star_fill.png';
+				}else{
+					star_src = 'images/star.png';
+				}
+
+				if( i != 0 ){
+					var new_thumb = "<input type='radio' class='img-option' id='ext-image-" + i + "' name='image-select' value='" + background + "'>" + " <label for='ext-image-" + i + "'><img src='" + thumb_img + "'></label><span class='make-fav'><img src="+star_src+" class='fav-img' data-fav="+is_fav+" data-id='"+i+"'></span>";
+				}else{
+					var new_thumb = "<input type='radio' class='img-option' id='ext-image-" + i + "' name='image-select' value='" + background + "'>" + " <label for='ext-image-" + i + "'><img src='" + thumb_img + "'></label>";
+				}
+
+				list.innerHTML = new_thumb;
+				list_parent.appendChild(list);
+
+				if( i == localStorage.length - 1 ){
+					chrome.storage.sync.get('page_background_image', function(obj) {
+						if(obj.page_background_image == undefined){
+							setTimeout(function(){
+								document.getElementsByClassName('img-option')[0].click();
+							}, 500);
+						}
+						fav_image_action();
+					});
+				}
 			}
-		}
-		changeBackgroundImage();
+			changeBackgroundImage();
+		});
 	}
 
 
@@ -245,6 +276,54 @@
 		}
 		var time = h + ' : ' + m; // + ' : ' + s;
 		time_wraper.innerHTML = time;
+	}
+
+
+	function fav_image_action() {
+		var stars = document.getElementsByClassName("fav-img");
+		var favs = {};
+
+		for (var i = 0; i < stars.length; i++) {
+			stars[i].addEventListener('click', function(){
+				var id = this.dataset.id;
+
+				if(this.dataset.fav == "true"){
+					this.src = 'images/star.png';
+					this.dataset.fav = false;
+					fav_image_action_popup('Removed from Favourite !', 'error');
+				}else{
+					this.src = 'images/star_fill.png';
+					this.dataset.fav = true;
+					fav_image_action_popup('Saved Image as Favourite !', 'success');
+				}
+				var fav_value = this.dataset.fav;
+				chrome.storage.sync.get('fav_images', function(obj){
+					if(obj.fav_images != undefined){
+						for (var j = 1; j <= obj.fav_images.length; j++) {
+							favs[j] = obj.fav_images[j];
+						}
+					}
+					favs[id] = fav_value;
+					chrome.storage.sync.set({'fav_images': favs}, function(){});
+				});
+			});
+		}
+	}
+
+
+	function fav_image_action_popup(message, type) {
+		var alert = document.getElementById('alert');
+		var inner_element = alert.getElementsByClassName('content')[0];
+		inner_element.innerHTML = message;
+		if(type == 'success'){
+			inner_element.style.color = "#078a07";	
+		}else{
+			inner_element.style.color = "#9a0909";
+		}
+		document.getElementById('alert').className = 'active';
+		setTimeout(function(){
+			document.getElementById('alert').className = '';
+		}, 2000);
 	}
 
 	var today = new Date()
