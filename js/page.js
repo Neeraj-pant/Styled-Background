@@ -7,8 +7,11 @@
 
 	var page_wraper = document.getElementsByClassName('back-page')[0];
 
+	const IMAGE_LIMIT = 2;
+
 	var quote_wraper = document.getElementById("quote");
 	var is_next_day = false;
+	var image_refreshed = false;
 
 	chrome.storage.sync.get("selected_background", function(obj) {
 		switch (obj.selected_background) {
@@ -37,14 +40,17 @@
 		chrome.storage.sync.remove('image_change_time', function (obj) {alert('removed Image Change Time');});
 		chrome.storage.sync.remove('quote', function(obj) {alert('Removed Quote')});
 		chrome.storage.sync.remove('fav_images', function(obj) {alert('Removed Fav images')});
+		chrome.storage.sync.remove('image_processed', function(obj) {alert('Removed image processed data')});
+		chrome.storage.sync.remove('fav_images_time', function(obj){alert('Cleared fav image time');});
 		localStorage.clear();
 		return;
 		//*/
 
-		selectedPageBackground();
+		//selectedPageBackground();
 		displayDailyQuote();
+		display_greeting();
 		getImageIds();
-		createImageThumbs();
+		// createImageThumbs();
 
 		var time_change = 1000*2;
 		displayCurrentTime();
@@ -88,45 +94,93 @@
 			if (obj.image_change_time != undefined) {
 				var now = getCurrentDate();
 				var old = obj.image_change_time;
-				is_next_day = (now.day != old.day) ? true : true;
-				generateImageRandomIds();
+				is_next_day = (now.day != old.day) ? true : false;
+				if(is_next_day){
+					chrome.storage.sync.set({'image_processed': 'false'}, function(){
+						generateImageRandomIds();
+					});
+				}else{
+					chrome.storage.sync.get('image_processed', function(obj){
+						if(obj.image_processed != undefined && obj.image_processed == 'true'){
+							image_refreshed = true;
+						}
+						generateImageRandomIds();
+					});
+				}
 			} else {
 				is_next_day = true;
-				generateImageRandomIds();
+				chrome.storage.sync.get('image_processed', function(obj){
+					if(obj.image_processed != undefined && obj.image_processed == 'true'){
+						image_refreshed = true;
+					}
+					generateImageRandomIds();
+				});
 			}
 		});
 	}
 
 
-	function generateImageRandomIds() {
+	function generateImageRandomIds(id) {
+		var id = id || 0;
+		if(!navigator.onLine){
+			is_next_day = false;
+		}
 		if (is_next_day) {
+			createImageThumbs();
 			var url = "https://source.unsplash.com/daily";
 			var convertFunction = convertFileToDataURLviaFileReader;
 			convertFunction(url, function(base64Img) {
 				localStorage.setItem(0, base64Img);
 				var date = getCurrentDate();
 				chrome.storage.sync.set({ 'image_change_time': date }, function() {});
+				chrome.storage.sync.set({'image_processed': 'false'}, function(){});
 				generateNewThumbs();
 			});
 			getQuote();
+		}else if(image_refreshed == 'false' || id != 0){
+			generateNewThumbs(id);
+			createImageThumbs(0, id);
+		}
+		else{
+			createImageThumbs();
 		}
 	}
 
 
-	function generateNewThumbs() {
+	function generateNewThumbs(id) {
+		var single_image = id || 0;
 		var win_width = screen.width;
 		var win_height = screen.height;
 		var url = "https://source.unsplash.com/random/" + win_width + "x" + win_height;
 		var i = 1;
 		var old_val = '';
 
+		if(single_image != 0){
+			i = single_image;
+		}
+
 		var arrange_thumb = function() {
-			if (i <= 2) {
-				chrome.storage.sync.get('fav_images', function(obj){
-					if(obj.fav_images != undefined){
-						if(obj.fav_images[i] == "true"){
-							i++;
-							arrange_thumb();
+			if (i <= IMAGE_LIMIT) {
+				if( i != single_image && single_image != 0){
+					i++;
+					arrange_thumb();
+				}else{
+					chrome.storage.sync.get('fav_images', function(obj){
+						if(obj.fav_images != undefined){
+							if(obj.fav_images[i] == "true"){
+								i++;
+								arrange_thumb();
+							}else{
+								var convertFunction = convertFileToDataURLviaFileReader;
+								convertFunction(url, function(base64Img) {
+									if(old_val != base64Img){
+										localStorage.setItem(i, base64Img);
+										i++;
+										old_val = base64Img;
+										arrange_thumb();
+									}
+								});
+							}
 						}else{
 							var convertFunction = convertFileToDataURLviaFileReader;
 							convertFunction(url, function(base64Img) {
@@ -138,47 +192,72 @@
 								}
 							});
 						}
-					}
-				});
+					});
+				}
 			}else{
-				createImageThumbs();
+				chrome.storage.sync.set({'image_processed': 'true'}, function(){});
+				var t_loader = document.getElementsByClassName('loading-image');
+				if(t_loader.length != 0){
+					for(var j = 0; j < t_loader.length; j++){
+						t_loader[j].style.display = 'none';
+					}
+				}
+				image_refreshed = true;
+				createImageThumbs(1);
 			}
 		}
-		arrange_thumb();
+		arrange_thumb(localStorage.length);
 	}
 
-	function createImageThumbs() {
+	function createImageThumbs(use_loader, id) {
+		var use_loader = use_loader || 0;
+		var refresh_one = id || 0;
+
 		var list_parent = document.getElementById('thumbs');
+
 		list_parent.innerHTML = '';
 		var fav_images = '';
 		var is_fav = false;
 		var star_src = 'images/star.png';
+		var border_color = "#fff";
+		var loading_class = '';
 
 		chrome.storage.sync.get('fav_images', function(obj){
 			if(obj.fav_images != undefined){
 				fav_images = obj.fav_images;
 			}
-
 			for (var i = 0; i < localStorage.length; i++) {
 				var list = document.createElement('li');
 				var thumb_img = localStorage.getItem(i);
 				var background = localStorage.key(i);
-
 				if(fav_images[i] == 'true'){
+					border_color = "#eb9c2d";
 					is_fav = true;
 					star_src = 'images/star_fill.png';
+					loading_class = '';
 				}else{
+					border_color = "#fff";
+					is_fav = false;
 					star_src = 'images/star.png';
+					if((is_next_day && use_loader == 0) || image_refreshed == false || ( i == id && id != 0)){
+						loading_class = 'loading-image';
+					}else{
+						loading_class = '';
+					}
 				}
 
 				if( i != 0 ){
-					var new_thumb = "<input type='radio' class='img-option' id='ext-image-" + i + "' name='image-select' value='" + background + "'>" + " <label for='ext-image-" + i + "'><img src='" + thumb_img + "'></label><span class='make-fav'><img src="+star_src+" class='fav-img' data-fav="+is_fav+" data-id='"+i+"'></span>";
+					var new_thumb = "<input type='radio' class='img-option' id='ext-image-" + i + "' name='image-select' value='" + background + "'>" + " <label for='ext-image-" + i + "'><img style='border-color:"+border_color+";' src='" + thumb_img + "'><span class='"+loading_class+"'></span></label><span class='make-fav'><img src="+star_src+" class='fav-img' data-fav="+is_fav+" data-id='"+i+"'></span>";
 				}else{
 					var new_thumb = "<input type='radio' class='img-option' id='ext-image-" + i + "' name='image-select' value='" + background + "'>" + " <label for='ext-image-" + i + "'><img src='" + thumb_img + "'></label>";
 				}
 
 				list.innerHTML = new_thumb;
 				list_parent.appendChild(list);
+
+				if((is_next_day && use_loader == 0) || image_refreshed == false || ( i == id && id != 0)){
+					change_star_visibility('none');
+				}
 
 				if( i == localStorage.length - 1 ){
 					chrome.storage.sync.get('page_background_image', function(obj) {
@@ -203,18 +282,12 @@
 		var yyyy = today.getFullYear();
 		var hours = today.getHours();
 		var minutes = today.getMinutes();
-
-		return {
-			'year': yyyy,
-			'month': mm,
-			'day': dd,
-			'hours': hours,
-			'minutes': minutes
-		};
+		return {'year': yyyy, 'month': mm, 'day': dd, 'hours': hours, 'minutes': minutes};
 	}
 
 
 	function changeBackgroundImage() {
+		selectedPageBackground();
 		var img_opt = document.getElementsByClassName('img-option');
 		for (var i = 0; i < img_opt.length; i++) {
 			img_opt[i].addEventListener('change', function() {
@@ -281,7 +354,7 @@
 
 	function fav_image_action() {
 		var stars = document.getElementsByClassName("fav-img");
-		var favs = {};
+		var favs = [];
 
 		for (var i = 0; i < stars.length; i++) {
 			stars[i].addEventListener('click', function(){
@@ -290,18 +363,20 @@
 				if(this.dataset.fav == "true"){
 					this.src = 'images/star.png';
 					this.dataset.fav = false;
-					fav_image_action_popup('Removed from Favourite !', 'error');
+					fav_image_action_popup('Image Removed from Favourite !', 'error');
+					document.querySelector('label[for=ext-image-'+id+ '] img').style.borderColor = "#fff";
+					get_image_fav_time(id);
 				}else{
 					this.src = 'images/star_fill.png';
 					this.dataset.fav = true;
-					fav_image_action_popup('Saved Image as Favourite !', 'success');
+					fav_image_action_popup('Image Saved as Favourite !', 'success');
+					document.querySelector('label[for=ext-image-'+id+ '] img').style.borderColor = "#eb9c2d";
+					set_image_fav_time(id);
 				}
 				var fav_value = this.dataset.fav;
 				chrome.storage.sync.get('fav_images', function(obj){
-					if(obj.fav_images != undefined){
-						for (var j = 1; j <= obj.fav_images.length; j++) {
-							favs[j] = obj.fav_images[j];
-						}
+					if( obj.fav_images != undefined){
+						favs =  obj.fav_images;
 					}
 					favs[id] = fav_value;
 					chrome.storage.sync.set({'fav_images': favs}, function(){});
@@ -310,13 +385,52 @@
 		}
 	}
 
+	function set_image_fav_time(id){
+		var day = getCurrentDate();
+		var fav_time = {};
+
+		chrome.storage.sync.get('fav_images_time', function(obj){
+			if(obj.fav_images_time != undefined){
+				var obj_length = Object.keys(obj.fav_images_time).length;
+				for(var i = 1; i <= obj_length; i++){
+					fav_time[i] = obj.fav_images_time[i];
+				}
+			}
+			fav_time[id] = day;
+			chrome.storage.sync.set({'fav_images_time': fav_time}, function(){});
+		});
+	}
+
+	function get_image_fav_time(id){
+		return;
+		if(navigator.onLine){
+			chrome.storage.sync.get('fav_images_time', function(obj){
+				if(typeof obj.fav_images_time[id] == 'object'){
+					var day = getCurrentDate();
+					if(day.day == obj.fav_images_time[id].day){
+						chrome.storage.sync.set({'image_processed': 'false'}, function(){
+							change_star_visibility('none');
+							generateImageRandomIds(id);
+						});
+					}
+				}
+			});
+		}
+	}
+
+	function change_star_visibility(display){
+		var fav_icon = document.getElementsByClassName('make-fav');
+			for(var i = 0; i <= fav_icon.length - 1; i++ ){
+				fav_icon[i].style.display = display;
+			}
+	}
 
 	function fav_image_action_popup(message, type) {
 		var alert = document.getElementById('alert');
 		var inner_element = alert.getElementsByClassName('content')[0];
 		inner_element.innerHTML = message;
 		if(type == 'success'){
-			inner_element.style.color = "#078a07";	
+			inner_element.style.color = "#078a07";
 		}else{
 			inner_element.style.color = "#9a0909";
 		}
@@ -326,13 +440,20 @@
 		}, 2000);
 	}
 
-	var today = new Date()
-	var curHr = today.getHours()
+	function display_greeting(){
+		var today = new Date()
+		var curHr = today.getHours()
+		var message = '';
+		var pos = document.getElementById("greetings");
 
-	if (curHr < 12) {
-	  console.log('good morning')
-	} else if (curHr < 18) {
-	  console.log('good afternoon')
-	} else {
-	  console.log('good evening')
+		if (curHr < 12) {
+		  message = "Good Morning";
+		} else if (curHr < 18) {
+		  message = "Good Afternoon";
+		} else {
+		  message = "Good Evening";
+		}
+
+		pos.innerHTML = message;
 	}
+
