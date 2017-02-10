@@ -9,6 +9,7 @@
 
 	const IMAGE_LIMIT = 2;
 
+	var is_incognito = chrome.extension.inIncognitoContext;
 	var quote_wraper = document.getElementById("quote");
 	var is_next_day = false;
 	var image_refreshed = [false, false, false];
@@ -53,7 +54,7 @@
 
 	function selectedPageBackground() {
 		chrome.storage.sync.get('page_background_image', function(obj) {
-			if (obj.page_background_image != undefined) {
+			if (obj.page_background_image != undefined && localStorage.length == 3) {
 				var url = localStorage.getItem(obj.page_background_image);
 				page_wraper.style.backgroundImage = 'url(' + url + ')';
 				var animate = setInterval(function() {
@@ -85,7 +86,11 @@
 			if (obj.image_change_time != undefined) {
 				var now = getCurrentDate();
 				var old = obj.image_change_time;
-				is_next_day = (now.day != old.day) ? true : false;
+				if(is_incognito == true && localStorage.length == 0){
+					is_next_day = true;
+				}else{
+					is_next_day = (now.day != old.day) ? true : false;
+				}
 				if(is_next_day){
 					if(navigator.onLine){
 						chrome.storage.sync.set({'image_processed': image_refreshed}, function(){
@@ -184,11 +189,11 @@
 					i++;
 					setTimeout(function(){
 						arrange_thumb();
-					}, 200);
+					}, 500);
 				}else{
 					chrome.storage.sync.get('fav_images', function(obj){
 						if(obj.fav_images != undefined){
-							if(obj.fav_images[i] == "true" && obj.fav_images != undefined){
+							if(obj.fav_images[i] == "true" && obj.fav_images != undefined && is_incognito == false){
 								image_refreshed[i] = true;
 								chrome.storage.sync.set({'image_processed': image_refreshed}, function(){});
 								i++;
@@ -205,7 +210,7 @@
 										createImageThumbs();
 										setTimeout(function(){
 											arrange_thumb();
-										}, 200);
+										}, 500);
 									}
 								});
 							}
@@ -221,7 +226,7 @@
 									createImageThumbs();
 									setTimeout(function(){
 										arrange_thumb();
-									}, 200);
+									}, 500);
 								}
 							});
 						}

@@ -3,7 +3,7 @@
 
 	"name": "Styled Background",
 	"description": "Display home and new tab background with different background images",
-	"version": "1.0",
+	"version": "1.0.1",
 
 	"chrome_url_overrides": {
 		"newtab": "index.html"
@@ -23,8 +23,7 @@
 	"incognito": "split",
 
 	"permissions": [
-		"storage",
-		"<all_urls>"
+		"storage"
 	],
 
 	"background": {
