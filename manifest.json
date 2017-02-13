@@ -10,24 +10,24 @@
 	},
 	
 	"browser_action": {
-		"default_icon": "icon.png",
-		"default_popup": "popup.html"
+		"default_icon"	: "icon_medium.png",
+		"default_popup"	: "popup.html"
 	},
+
+	"incognito"	: "not_allowed",
 
 	"icons": {
-	  "200": "icon.png",
-	  "128": "icon.png",
-		"19": "icon.png"
+		"200"	: "icon_full.png",
+		"128"	: "icon_medium.png",
+		"19"	: "icon_small.png"
 	},
-
-	"incognito": "split",
 
 	"permissions": [
 		"storage"
 	],
 
 	"background": {
-	    "scripts": ["js/popup.js"],
+	    "scripts"	: ["js/popup.js"],
 	    "persistent": false
   	}
   	

@@ -9,7 +9,6 @@
 
 	const IMAGE_LIMIT = 2;
 
-	var is_incognito = chrome.extension.inIncognitoContext;
 	var quote_wraper = document.getElementById("quote");
 	var is_next_day = false;
 	var image_refreshed = [false, false, false];
@@ -86,9 +85,7 @@
 			if (obj.image_change_time != undefined) {
 				var now = getCurrentDate();
 				var old = obj.image_change_time;
-				if(is_incognito == true && localStorage.length == 0){
-					is_next_day = true;
-				}else{
+				else{
 					is_next_day = (now.day != old.day) ? true : false;
 				}
 				if(is_next_day){
@@ -193,7 +190,7 @@
 				}else{
 					chrome.storage.sync.get('fav_images', function(obj){
 						if(obj.fav_images != undefined){
-							if(obj.fav_images[i] == "true" && obj.fav_images != undefined && is_incognito == false){
+							if(obj.fav_images[i] == "true" && obj.fav_images != undefined){
 								image_refreshed[i] = true;
 								chrome.storage.sync.set({'image_processed': image_refreshed}, function(){});
 								i++;
