@@ -3,7 +3,7 @@
 
 	"name": "Styled Background",
 	"description": "Display home and new tab background with different background images",
-	"version": "1.0.1",
+	"version": "1.0",
 
 	"chrome_url_overrides": {
 		"newtab": "index.html"
@@ -27,8 +27,7 @@
 	],
 
 	"background": {
-	    "scripts"	: ["js/popup.js"],
-	    "persistent": false
+	    "scripts"	: ["js/popup.js"]
   	}
   	
 }

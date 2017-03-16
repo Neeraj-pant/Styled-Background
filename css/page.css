@@ -261,3 +261,16 @@ div#current-time span {
     font-size: 22px;
     margin-top: 5px;
 }
+
+#startup img {
+    width: 100%;
+    cursor: pointer;
+}
+
+#startup {
+    position: absolute;
+    left: 30px;
+    top: 30px;
+    width: calc(100% - 60px);
+    z-index: 99;
+}

@@ -4,14 +4,12 @@
 	var google_opt = document.getElementById('google-wrapper');
 	var custom_opt = document.getElementById('custom-wrapper');
 	var time_wraper = document.getElementById('current-time');
-
 	var page_wraper = document.getElementsByClassName('back-page')[0];
-
-	const IMAGE_LIMIT = 2;
-
 	var quote_wraper = document.getElementById("quote");
 	var is_next_day = false;
 	var image_refreshed = [false, false, false];
+	const IMAGE_LIMIT = 2;
+	const QUOTE_LIMIT = 100;
 
 	chrome.storage.sync.get("selected_background", function(obj) {
 		switch (obj.selected_background) {
@@ -31,7 +29,7 @@
 
 
 	function customImagePageInit() {
-		// Clear Every Stored Data Test only
+		// Clear Every Stored Data for Test purpose only
 		/*
 		chrome.storage.sync.clear();
 		localStorage.clear();
@@ -53,19 +51,19 @@
 
 	function selectedPageBackground() {
 		chrome.storage.sync.get('page_background_image', function(obj) {
-			if (obj.page_background_image != undefined && localStorage.length == 3) {
+			if (obj.page_background_image != undefined) {
 				var url = localStorage.getItem(obj.page_background_image);
 				page_wraper.style.backgroundImage = 'url(' + url + ')';
-				var animate = setInterval(function() {
-					page_wraper.style.opacity = 1;
-					clearInterval(animate);
-				}, 5);
+				page_wraper.style.opacity = 1;
 			} else {
-				page_wraper.style.backgroundImage = 'url(images/back2.jpg)';
-				var animate = setInterval(function() {
-					page_wraper.style.opacity = 1;
-					clearInterval(animate);
-				}, 5);
+				page_wraper.style.backgroundImage = 'url(images/default1.jpg)';
+				page_wraper.style.opacity = 1;
+				var intro = document.getElementById("startup");
+				intro.style.display = "block";
+				intro.innerHTML = "";
+				var intro_image = document.createElement("img");
+				intro_image.src = "images/intro.jpg";
+				intro.appendChild(intro_image);
 			}
 		});
 	}
@@ -75,6 +73,8 @@
 		chrome.storage.sync.get('quote', function(obj) {
 			if (obj.quote != undefined) {
 				quote_wraper.innerHTML = obj.quote;
+			}else{
+				getQuote();
 			}
 		});
 	}
@@ -85,9 +85,7 @@
 			if (obj.image_change_time != undefined) {
 				var now = getCurrentDate();
 				var old = obj.image_change_time;
-				else{
-					is_next_day = (now.day != old.day) ? true : false;
-				}
+				is_next_day = (now.day != old.day) ? true : false;
 				if(is_next_day){
 					if(navigator.onLine){
 						chrome.storage.sync.set({'image_processed': image_refreshed}, function(){
@@ -184,9 +182,7 @@
 			if (i <= IMAGE_LIMIT) {
 				if( i != single_image && single_image != 0 || image_refreshed[i] == true){
 					i++;
-					setTimeout(function(){
-						arrange_thumb();
-					}, 500);
+					arrange_thumb();
 				}else{
 					chrome.storage.sync.get('fav_images', function(obj){
 						if(obj.fav_images != undefined){
@@ -207,7 +203,7 @@
 										createImageThumbs();
 										setTimeout(function(){
 											arrange_thumb();
-										}, 500);
+										}, 650);
 									}
 								});
 							}
@@ -223,7 +219,7 @@
 									createImageThumbs();
 									setTimeout(function(){
 										arrange_thumb();
-									}, 500);
+									}, 650);
 								}
 							});
 						}
@@ -266,16 +262,11 @@
 					border_color = "transparent";
 					is_fav = false;
 					star_src = 'images/star.png';
-					if(image_refreshed[i] == false){
+					if(image_refreshed[i] == false && navigator.onLine){
 						loading_class = 'loading-image'
 					}else{
 						loading_class = '';
 					}
-					// if((is_next_day && use_loader == 0) || image_refreshed == false || ( i == id && id != 0) && navigator.onLine){
-					// 	loading_class = 'loading-image';
-					// }else{
-					// 	loading_class = '';
-					// }
 				}
 
 				if( i != 0 ){
@@ -310,7 +301,7 @@
 	function getCurrentDate() {
 		var today = new Date();
 		var dd = today.getDate();
-		var mm = today.getMonth() + 1; //January is 0!
+		var mm = today.getMonth() + 1;
 		var yyyy = today.getFullYear();
 		var hours = today.getHours();
 		var minutes = today.getMinutes();
@@ -340,7 +331,9 @@
 			reader.onloadend = function() {
 				callback(reader.result);
 			}
-			reader.readAsDataURL(xhr.response);
+			if(xhr.response){
+				reader.readAsDataURL(xhr.response);
+			}
 		};
 		xhr.open('GET', url);
 		xhr.send();
@@ -350,12 +343,14 @@
 	function convertFileToDataURLviaFileReader2(url, callback) {
 		var xhr = new XMLHttpRequest();
 		xhr.responseType = 'text/javascript';
-		xhr.onload = function() {
+		xhr.onload =	 function() {
 			var reader = new FileReader();
 			reader.onloadend = function() {
 				callback(reader.result);
 			}
-			reader.readAsDataURL(xhr.response);
+			if(xhr.response){
+				reader.readAsDataURL(xhr.response);
+			}
 		};
 		xhr.open('GET', url);
 		xhr.send();
@@ -363,7 +358,7 @@
 
 
 	function getQuote() {
-		var random_num = Math.floor(Math.random() * 437)
+		var random_num = Math.floor(Math.random() * QUOTE_LIMIT)
 		var quote = quotes[random_num];
 		chrome.storage.sync.set({ 'quote': quote }, function() {});
 		displayDailyQuote();
@@ -377,10 +372,11 @@
 		var m = now.getMinutes();
 		var s = now.getSeconds();
 		var dd = now.getDate();
+		var day = now.getDay();
 		var yyyy = now.getFullYear();
 		
 		var m_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
+		var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 		if(h < 10){
 			h = '0' + h;
 		}
@@ -388,7 +384,7 @@
 			m = '0' + m;
 		}
 		var time = h + ' : ' + m;
-		time += "<span>"+m_names[month]+" / "+dd+" / "+yyyy+"</span>"
+		time += "<span>"+days[day]+" "+dd+" / "+m_names[month]+" / "+yyyy+"</span>"
 		time_wraper.innerHTML = time;
 	}
 
