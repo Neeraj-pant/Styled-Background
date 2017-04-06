@@ -7,9 +7,14 @@
 	var page_wraper = document.getElementsByClassName('back-page')[0];
 	var quote_wraper = document.getElementById("quote");
 	var is_next_day = false;
-	var image_refreshed = [false, false, false];
+	var image_refreshed = new Array();
 	const IMAGE_LIMIT = 2;
 	const QUOTE_LIMIT = 100;
+	const DEFAULT_IMAGE = 'images/default1.jpg';
+
+	for( var x = 0; x <= IMAGE_LIMIT; x++){
+		image_refreshed[x] = false;
+	}
 
 	chrome.storage.sync.get("selected_background", function(obj) {
 		switch (obj.selected_background) {
@@ -56,14 +61,18 @@
 				page_wraper.style.backgroundImage = 'url(' + url + ')';
 				page_wraper.style.opacity = 1;
 			} else {
-				page_wraper.style.backgroundImage = 'url(images/default1.jpg)';
+				page_wraper.style.backgroundImage = 'url('+DEFAULT_IMAGE+')';
 				page_wraper.style.opacity = 1;
 				var intro = document.getElementById("startup");
 				intro.style.display = "block";
 				intro.innerHTML = "";
 				var intro_image = document.createElement("img");
 				intro_image.src = "images/intro.jpg";
+				intro_image.title = "Click to Close Guide.";
 				intro.appendChild(intro_image);
+				intro.addEventListener('click', function(){
+					intro.style.display = 'none';
+				});
 			}
 		});
 	}
@@ -92,7 +101,9 @@
 							generateImageRandomIds();
 						});
 					}else{
-						image_refreshed = [true, true, true];
+						for( var x = 0; x <= IMAGE_LIMIT; x++){
+							image_refreshed[x] = true;
+						}
 						chrome.storage.sync.set({'image_processed': image_refreshed}, function(){
 							generateImageRandomIds();
 						});
@@ -100,7 +111,7 @@
 				}else{
 					chrome.storage.sync.get('image_processed', function(obj){
 						if(obj.image_processed != undefined){
-							for(var i = 0; i <=2; i++){
+							for(var i = 0; i <= IMAGE_LIMIT; i++){
 								image_refreshed[i] = obj.image_processed[i];
 							}
 						}
@@ -111,12 +122,17 @@
 				is_next_day = true;
 				chrome.storage.sync.get('image_processed', function(obj){
 					if(obj.image_processed != undefined){
-						for(var i = 0; i <=2; i++){
+						for(var i = 0; i <= IMAGE_LIMIT; i++){
 							image_refreshed[i] = obj.image_processed[i];
 						}
 					}
 					generateImageRandomIds();
 				});
+			}
+			if(navigator.onLine){
+				for(var i = 0; i <= IMAGE_LIMIT; i++){
+					image_refreshed[i] = false;
+				}
 			}
 		});
 	}
@@ -157,6 +173,7 @@
 			if(image_refreshed[i] == false && navigator.onLine){
 				generateNewThumbs(i);
 				f = 1;
+				createImageThumbs();
 			}
 		}
 		if(f == 0){
@@ -169,10 +186,9 @@
 		var single_image = id || 0;
 		var win_width = screen.width;
 		var win_height = screen.height;
-		var url = "https://source.unsplash.com/random/" + win_width + "x" + win_height;
 		var i = 1;
-		var old_val = '';
 		var updated = [];
+		var draw_image = false;
 
 		if(single_image != 0){
 			i = single_image;
@@ -186,41 +202,32 @@
 				}else{
 					chrome.storage.sync.get('fav_images', function(obj){
 						if(obj.fav_images != undefined){
-							if(obj.fav_images[i] == "true" && obj.fav_images != undefined){
+							if(obj.fav_images[i] == "true"){
+								draw_image = false;
 								image_refreshed[i] = true;
 								chrome.storage.sync.set({'image_processed': image_refreshed}, function(){});
 								i++;
 								arrange_thumb();
 							}else{
-								var convertFunction = convertFileToDataURLviaFileReader;
-								convertFunction(url, function(base64Img) {
-									if(old_val != base64Img){
-										localStorage.setItem(i, base64Img);
-										image_refreshed[i] = true;
-										chrome.storage.sync.set({'image_processed': image_refreshed}, function(){});
-										i++;
-										old_val = base64Img;
-										createImageThumbs();
-										setTimeout(function(){
-											arrange_thumb();
-										}, 650);
-									}
-								});
+								draw_image = true;
 							}
 						}else{
+							draw_image = true;
+						}
+
+						if(draw_image) {
+							win_height += i;
+							win_width += i;
+							var url = "https://source.unsplash.com/random/" + win_width + "x" + win_height;
+
 							var convertFunction = convertFileToDataURLviaFileReader;
 							convertFunction(url, function(base64Img) {
-								if(old_val != base64Img){
-									localStorage.setItem(i, base64Img);
-									image_refreshed[i] = true;
-									chrome.storage.sync.set({'image_processed': image_refreshed}, function(){});
-									i++;
-									old_val = base64Img;
-									createImageThumbs();
-									setTimeout(function(){
-										arrange_thumb();
-									}, 650);
-								}
+								localStorage.setItem(i, base64Img);
+								image_refreshed[i] = true;
+								chrome.storage.sync.set({'image_processed': image_refreshed}, function(){});
+								i++;
+								createImageThumbs();
+								arrange_thumb();
 							});
 						}
 					});
@@ -249,6 +256,9 @@
 			if(obj.fav_images != undefined){
 				fav_images = obj.fav_images;
 			}
+
+			list_parent.innerHTML = '';
+
 			for (var i = 0; i < localStorage.length; i++) {
 				var list = document.createElement('li');
 				var thumb_img = localStorage.getItem(i);
@@ -282,7 +292,7 @@
 					change_star_visibility('none');
 				}
 
-				if( i == localStorage.length - 1 ){
+				//if( i == localStorage.length - 1 ){
 					chrome.storage.sync.get('page_background_image', function(obj) {
 						if(obj.page_background_image == undefined){
 							setTimeout(function(){
@@ -291,7 +301,7 @@
 						}
 						fav_image_action();
 					});
-				}
+				//}
 			}
 			changeBackgroundImage();
 		});
