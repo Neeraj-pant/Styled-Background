@@ -15,10 +15,8 @@ chrome.storage.sync.get("selected_background", function (obj) {
     }
 });
 
-
 all_option.forEach(function(item,index,arr) {
     item.addEventListener('click', function(){
         chrome.storage.sync.set({'selected_background': this.value}, function() {});
-        window.location.href = window.location.href;
     });
 });

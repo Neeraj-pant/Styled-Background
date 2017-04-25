@@ -11,7 +11,7 @@ html,
 body {
     width: 100%;
     height: 100%;
-    overflow-x: hidden
+    overflow-x: hidden;
     font-family: 'Roboto', sans-serif;
     overflow: hidden;
 }
@@ -55,7 +55,7 @@ input[id^=ext-image]:checked ~ label {
     list-style: none;
     width: 90px;
     opacity: .80;
-    transition: all .2s ease-in;
+    /*transition: all .2s ease-in;*/
     margin: 10px 0;
     position: relative
 }
@@ -91,12 +91,14 @@ input[id^=ext-image]:checked ~ label {
     background: -webkit-gradient(linear, left top, left bottom,        color-stop(5%, rgba(0, 0, 0, 0.4)),        color-stop(20%, rgba(0, 0, 0, 0.24)),        color-stop(80%, rgba(0, 0, 0, 0.38)),        to(rgba(0, 0, 0, 0.37)));
 }
 
-.back-page {
+#back-page {
     background-color: #fff;
     background-position: 50%;
     background-size: cover;
-    transition: all .8s ease-in;
     height: 100%
+}
+.back-animate{
+    transition: all .8s ease-in-out;    
 }
 
 #custom-wrapper {
@@ -123,7 +125,7 @@ input[id^=ext-image]:checked ~ label {
 #quote {
     text-align: center;
     color: #fff;
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.35);
     padding: 10px 20px;
     display: inline-block;
     font-size: 18px;
@@ -136,7 +138,7 @@ input[id^=ext-image]:checked ~ label {
     position: absolute;
     z-index: 9;
     color: #ffffff;
-    background: rgba(255, 255, 255, 0.35);
+    background: rgba(0, 0, 0, 0.35);
     padding: 10px 50px;
     font-size: 50px;
     transform: translate(-50%, -50%);
@@ -252,7 +254,7 @@ div#greetings {
     z-index: 9;
     color: #ffffff;
     padding: 15px 40px;
-    font-size: 38px;
+    font-size: 44px;
     transform: translateX(-50%);
     left: 50%;
 }
