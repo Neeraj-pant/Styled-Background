@@ -68,6 +68,7 @@
 		}
 	}
 
+
 	function selectedPageBackground() {
 		chrome.storage.sync.get('page_background_image', function(obj) {
 			if (obj.page_background_image != undefined) {
@@ -317,10 +318,10 @@
 							document.getElementsByClassName('img-option')[0].click();
 						}, 500);
 					}
-					fav_image_action();
 				});
 			}
 			changeBackgroundImage();
+			fav_image_action();
 		});
 	}
 
@@ -432,7 +433,6 @@
 		for (var i = 0; i < stars.length; i++) {
 			stars[i].addEventListener('click', function(){
 				var id = this.dataset.id;
-
 				if(this.dataset.fav == "true"){
 					this.src = 'images/star.png';
 					this.dataset.fav = false;

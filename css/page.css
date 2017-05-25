@@ -265,7 +265,6 @@ div#current-time span {
 }
 
 #startup img {
-    width: 100%;
     cursor: pointer;
 }
 
@@ -275,4 +274,5 @@ div#current-time span {
     top: 30px;
     width: calc(100% - 60px);
     z-index: 99;
+    text-align: center;
 }
